@@ -36,6 +36,60 @@
         }
 
         /* =========================================
+           LOADING SCREEN (NON-CIRCULAR)
+           ========================================= */
+        #loader-wrapper {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: #050505;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            transition: opacity 0.6s ease, visibility 0.6s ease;
+        }
+
+        .loader-text {
+            font-family: 'Playfair Display', serif;
+            font-size: 2rem;
+            color: #FFD700;
+            letter-spacing: 2px;
+            margin-bottom: 20px;
+            animation: pulseText 1.5s infinite;
+        }
+
+        .progress-bar-container {
+            width: 250px;
+            height: 4px;
+            background: rgba(255, 215, 0, 0.15);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .progress-bar-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #FFD700, #FDB931);
+            width: 0%;
+            border-radius: 4px;
+            animation: loadProgress 2s ease-in-out forwards;
+        }
+
+        @keyframes loadProgress {
+            0% { width: 0%; }
+            50% { width: 70%; }
+            100% { width: 100%; }
+        }
+
+        @keyframes pulseText {
+            0%, 100% { opacity: 0.7; transform: scale(1); }
+            50% { opacity: 1; transform: scale(1.02); }
+        }
+
+        /* =========================================
            HERO SECTION
            ========================================= */
         .hero {
@@ -218,6 +272,14 @@
 </head>
 <body>
 
+    <!-- Loading Screen -->
+    <div id="loader-wrapper">
+        <div class="loader-text">Focus Admission</div>
+        <div class="progress-bar-container">
+            <div class="progress-bar-fill"></div>
+        </div>
+    </div>
+
     <header class="hero">
         <h1>Focus Online Admission Classes</h1>
         <p>Empowering Your Journey to Success</p>
@@ -248,7 +310,8 @@
                 <button class="btn-back" onclick="goBack()">← Return to Dashboard</button>
             </div>
             <div class="video-grid" id="video-container">
-                </div>
+                <!-- Videos will be injected here via JavaScript -->
+            </div>
         </section>
 
     </main>
@@ -261,37 +324,51 @@
 
     <script>
         /* ------------------------------------------------------------------
+           0. LOADER REMOVAL SCRIPT
+        ------------------------------------------------------------------ */
+        window.addEventListener('load', () => {
+            const loader = document.getElementById('loader-wrapper');
+            // Wait slightly so the progress bar finishes its animation beautifully
+            setTimeout(() => {
+                loader.style.opacity = '0';
+                loader.style.visibility = 'hidden';
+            }, 2100); 
+        });
+
+        /* ------------------------------------------------------------------
            1. OBFUSCATED VIDEO IDs
            We only store Base64 encoded Video IDs, not full links.
-           Example: "ak4wMFA2REpVV2M=" decodes to "jN00P6DJUWc"
         ------------------------------------------------------------------ */
         const curriculum = {
             bangla: {
                 title: "Bangla Classes",
                 videos: [
                     { title: "Bangla Class Lecture 01", encodedId: "ak4wMFA2REpVV2M=" },
-                    { title: "Bangla Class Lecture 02", encodedId: "aXp2eUZoM1d0VEE=" }
+                    { title: "Bangla Class Lecture 02", encodedId: "aXp2eUZoM1d0VEE=" },
+                    { title: "Bangla Class Lecture 03", encodedId: "bW5DQmVhTTI4cnM=" } /* Added Lecture 03 */
                 ]
             },
             english: {
                 title: "English Classes",
                 videos: [
                     { title: "English Class Lecture 01", encodedId: "OFRFTDB2VDZGaDQ=" },
-                    { title: "English Class Lecture 02", encodedId: "SC00TFRyeGpwNms=" }
+                    { title: "English Class Lecture 02", encodedId: "SC00TFRyeGpwNms=" },
+                    { title: "English Class Lecture 03", encodedId: "T01zeldmblhjME0=" } /* Added Lecture 03 */
                 ]
             },
             gk: {
                 title: "General Knowledge (GK)",
                 videos: [
                     { title: "GK Class Lecture 01", encodedId: "LUdNSlJ5RUQtSlE=" },
-                    { title: "GK Class Lecture 02", encodedId: "dHJoamlPajlfckk=" }
+                    { title: "GK Class Lecture 02", encodedId: "dHJoamlPajlfckk=" },
+                    { title: "GK Class Lecture 03", encodedId: "SFNpeXBxekd0X2s=" } /* Added Lecture 03 */
                 ]
             }
         };
 
         let activePlayers = []; // Keep track of active YouTube players
 
-        // Optional: Ensure YT API is loaded (It calls this globally when ready)
+        // Ensure YT API is loaded (It calls this globally when ready)
         let isYTReady = false;
         function onYouTubeIframeAPIReady() {
             isYTReady = true;
@@ -326,7 +403,8 @@
                     <div class="video-wrapper">
                         <div class="video-title">${video.title}</div>
                         <div class="iframe-container">
-                            <div id="${playerId}"></div> </div>
+                            <div id="${playerId}"></div> 
+                        </div>
                     </div>
                 `;
                 videoContainer.insertAdjacentHTML('beforeend', videoHTML);
