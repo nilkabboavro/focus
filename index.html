@@ -328,7 +328,6 @@
         ------------------------------------------------------------------ */
         window.addEventListener('load', () => {
             const loader = document.getElementById('loader-wrapper');
-            // Wait slightly so the progress bar finishes its animation beautifully
             setTimeout(() => {
                 loader.style.opacity = '0';
                 loader.style.visibility = 'hidden';
@@ -345,7 +344,8 @@
                 videos: [
                     { title: "Bangla Class Lecture 01", encodedId: "ak4wMFA2REpVV2M=" },
                     { title: "Bangla Class Lecture 02", encodedId: "aXp2eUZoM1d0VEE=" },
-                    { title: "Bangla Class Lecture 03", encodedId: "bW5DQmVhTTI4cnM=" } /* Added Lecture 03 */
+                    { title: "Bangla Class Lecture 03", encodedId: "bW5DQmVhTTI4cnM=" },
+                    { title: "Bangla Class Lecture 04 (Written)", encodedId: "aEtDNkFSUDJDRzA=" }
                 ]
             },
             english: {
@@ -353,7 +353,8 @@
                 videos: [
                     { title: "English Class Lecture 01", encodedId: "OFRFTDB2VDZGaDQ=" },
                     { title: "English Class Lecture 02", encodedId: "SC00TFRyeGpwNms=" },
-                    { title: "English Class Lecture 03", encodedId: "T01zeldmblhjME0=" } /* Added Lecture 03 */
+                    { title: "English Class Lecture 03", encodedId: "T01zeldmblhjME0=" },
+                    { title: "English Class Lecture 04 (Written)", encodedId: "UzRhTG9wekNHa2c=" }
                 ]
             },
             gk: {
@@ -361,14 +362,14 @@
                 videos: [
                     { title: "GK Class Lecture 01", encodedId: "LUdNSlJ5RUQtSlE=" },
                     { title: "GK Class Lecture 02", encodedId: "dHJoamlPajlfckk=" },
-                    { title: "GK Class Lecture 03", encodedId: "SFNpeXBxekd0X2s=" } /* Added Lecture 03 */
+                    { title: "GK Class Lecture 03", encodedId: "SFNpeXBxekd0X2s=" },
+                    { title: "GK Class Lecture 04", encodedId: "NWl5MGV6RW1qZUU=" }
                 ]
             }
         };
 
-        let activePlayers = []; // Keep track of active YouTube players
+        let activePlayers = [];
 
-        // Ensure YT API is loaded (It calls this globally when ready)
         let isYTReady = false;
         function onYouTubeIframeAPIReady() {
             isYTReady = true;
@@ -391,13 +392,11 @@
             const data = curriculum[subjectKey];
             sectionTitle.textContent = data.title;
             
-            // Clean up previous UI and active players
             videoContainer.innerHTML = '';
             activePlayers = [];
 
-            // 1. Generate DOM place-holders for the YouTube API
             data.videos.forEach((video, index) => {
-                const playerId = `yt-player-${index}`; // Unique ID for each video div
+                const playerId = `yt-player-${index}`; 
                 
                 const videoHTML = `
                     <div class="video-wrapper">
@@ -410,27 +409,24 @@
                 videoContainer.insertAdjacentHTML('beforeend', videoHTML);
             });
 
-            // 2. Initialize YouTube API for each placeholder
             data.videos.forEach((video, index) => {
                 const playerId = `yt-player-${index}`;
-                const decodedVideoId = atob(video.encodedId); // Decode Base64 to get raw ID
+                const decodedVideoId = atob(video.encodedId); 
 
-                // Create new player with strict distraction-free parameters
                 const player = new YT.Player(playerId, {
                     videoId: decodedVideoId,
                     playerVars: {
                         'playsinline': 1,
-                        'rel': 0,             // Restrict related videos to the same channel
-                        'modestbranding': 1,  // Hide the YouTube logo
-                        'iv_load_policy': 3,  // Hide video annotations
-                        'fs': 1               // Allow fullscreen
+                        'rel': 0,             
+                        'modestbranding': 1,  
+                        'iv_load_policy': 3,  
+                        'fs': 1               
                     }
                 });
                 
-                activePlayers.push(player); // Store reference so we can destroy it later
+                activePlayers.push(player); 
             });
 
-            // 3. Smooth View Transition
             dashboardView.classList.remove('active');
             dashboardView.classList.add('hidden');
             
@@ -441,11 +437,9 @@
         }
 
         function goBack() {
-            // 1. Hide the video section
             videoSectionView.classList.remove('active');
             videoSectionView.classList.add('hidden');
             
-            // 2. Safely destroy all YouTube API instances to completely kill background audio/memory
             setTimeout(() => {
                 activePlayers.forEach(player => {
                     if(player && typeof player.destroy === 'function') {
@@ -455,7 +449,6 @@
                 activePlayers = [];
                 videoContainer.innerHTML = '';
                 
-                // Show dashboard
                 dashboardView.classList.remove('hidden');
                 dashboardView.classList.add('active');
             }, 300);
@@ -465,19 +458,15 @@
            3. STRICT ANTI-PIRACY & SECURITY 
         ------------------------------------------------------------------ */
         
-        // Disable Right-Click (Context Menu)
         document.addEventListener('contextmenu', function(e) {
             e.preventDefault();
         });
 
-        // Disable Developer Keyboard Shortcuts
         document.addEventListener('keydown', function(e) {
-            // Block F12
             if (e.key === 'F12' || e.keyCode === 123) {
                 e.preventDefault();
             }
 
-            // Block Ctrl+Shift+I (Inspector), J (Console), C (Element Inspector)
             if (e.ctrlKey && e.shiftKey && 
                (e.key === 'I' || e.key === 'i' || e.keyCode === 73 || 
                 e.key === 'J' || e.key === 'j' || e.keyCode === 74 || 
@@ -485,7 +474,6 @@
                 e.preventDefault();
             }
 
-            // Block Ctrl+U (View Source)
             if (e.ctrlKey && (e.key === 'U' || e.key === 'u' || e.keyCode === 85)) {
                 e.preventDefault();
             }
